@@ -1,0 +1,8 @@
+node_modules
+.env
+.greennode.json
+.agentbase
+.git
+.gitignore
+*.md
+data-loader.js.bak

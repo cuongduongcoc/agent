@@ -1,0 +1,17 @@
+{
+  "name": "agent",
+  "version": "1.0.0",
+  "description": "A bundle of [SKILL.md](https://www.mintlify.com/blog/skill-md)-compatible skills that drive the full **GreenNode AgentBase** lifecycle — scaffold → configure → code → test → deploy → monitor → teardown — from inside your AI coding tool.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXA × MSB · App Demo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="assets/icon.png" alt="NEXA" class="bot-icon">
+    <div>
+      <h1>NEXA <span class="x">×</span> MSB</h1>
+      <span class="subtitle">App mô phỏng · Giao dịch thật → Gợi ý BH thông minh</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <select id="customerSelect" aria-label="Chọn khách hàng"></select>
+  </div>
+</header>
+
+<main>
+  <!-- Phone: full MSB app simulation -->
+  <section class="phone-section">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" id="phoneScreen"></div>
+    </div>
+    <div class="phone-label">MSB Mobile Banking · Mô phỏng tương tác</div>
+  </section>
+
+  <!-- Agent reasoning panel -->
+  <section class="reasoning-section">
+    <div class="rs-header">
+      <img src="assets/icon.png" class="rs-icon">
+      <div class="rs-info">
+        <div class="rs-title">NEXA Agent</div>
+        <div class="rs-status" id="agentStatus">● monitoring</div>
+      </div>
+    </div>
+    <div class="rs-tabs">
+      <button class="rs-tab active" data-tab="reasoning">🧠 Reasoning</button>
+      <button class="rs-tab" data-tab="profile">👤 Profile</button>
+    </div>
+    <div class="rs-body" id="rsBody"></div>
+  </section>
+</main>
+
+<div class="hint" id="hint">
+  👈 Thao tác trên app MSB · NEXA quan sát giao dịch, số dư, lịch sử để gợi ý bảo hiểm
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

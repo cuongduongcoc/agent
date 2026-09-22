@@ -1,0 +1,36 @@
+# Superpowers internal — specs, plans, SDD scratch
+docs/superpowers/
+.superpowers/
+
+# Release process notes (internal maintainer only)
+docs/internal/
+
+# Local secrets
+.env
+.greennode.json
+nexa/.greennode.json
+
+# Dependencies
+node_modules/
+nexa/node_modules/
+
+# AgentBase temp files
+.agentbase/
+nexa/.agentbase/
+*.token_cache
+.agentbase_token.txt
+.cr_creds.json
+.cr_secret.txt
+.runtime_info.json
+.runtime_id.txt
+.runtime_active.json
+.new_image.txt
+.update_body.json
+.update_runtime.ps1
+.check_sheet3.js
+
+# Docker
+nexa/data/
+
+# Nested git repo
+greennode-agentbase-skills/
