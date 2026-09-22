@@ -1,212 +1,245 @@
-# GreenNode AgentBase Skills
+# NEXA × MSB — AI Agent Demo
 
-A bundle of [SKILL.md](https://www.mintlify.com/blog/skill-md)-compatible skills that drive the full **GreenNode AgentBase** lifecycle — scaffold → configure → code → test → deploy → monitor → teardown — from inside your AI coding tool.
+**Trải nghiệm app MSB thật → Giao dịch → NEXA gợi ý BH → Chatbot tư vấn**
 
-Drop them into **Claude Code**, **OpenAI Codex**, or any other SKILL.md-aware client and you get slash commands like `/agentbase-wizard`, `/agentbase-deploy`, `/agentbase-monitor`. The skills are plain Markdown + shell — no client-specific runtime — so the **full lifecycle works in every tool that can read SKILL.md and run a shell**.
+NEXA là AI Agent tối đa hóa cơ hội chuyển đổi sản phẩm bảo hiểm qua can thiệp ngữ cảnh chính xác. Agent quan sát giao dịch khách hàng, tính toán Need + Readiness score, và gợi ý bảo hiểm đúng lúc qua tin nhắn trong app.
 
 ---
 
-## Install in 30 Seconds
+## Quick Start
 
-### Claude Code
+### Chạy local
 
 ```bash
-claude plugin marketplace add vngcloud/greennode-agentbase-skills
+cd nexa
+npm install
+npm start
 ```
 
-Then inside Claude Code:
+Mở **http://localhost:8080**
 
-```
-/plugin install greennode-agentbase@greennode-agentbase
-```
-
-**Team distribution** — add to your project's `.claude/settings.json` so teammates are prompted to install automatically:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "greennode-agentbase": {
-      "source": { "source": "github", "repo": "vngcloud/greennode-agentbase-skills" }
-    }
-  }
-}
-```
-
-### Codex CLI
+### Deploy lên GreenNode AgentBase
 
 ```bash
-codex plugin marketplace add vngcloud/greennode-agentbase-skills
+cd nexa
+docker build --platform linux/amd64 -t <registry>/<repo>/nexa:<tag> .
+docker push <registry>/<repo>/nexa:<tag>
+# Update runtime via AgentBase API
 ```
 
-Then install the plugin:
-
-```bash
-codex plugin add greennode-agentbase@greennode-agentbase
-```
-
-### Compatibility
-
-| Tool | Install method | Shell scripts supported |
-|---|---|---|
-| Claude Code | `claude plugin marketplace add` | Yes |
-| Codex CLI | `codex plugin marketplace add` | Yes |
-
+**Endpoint production**: https://endpoint-a9323e02-88e8-4eac-b841-0f19c16a9e5d.agentbase-runtime.aiplatform.vngcloud.vn
 
 ---
 
-## Prerequisites
+## Hướng dẫn sử dụng demo
 
-Before any skill that hits the platform, set GreenNode IAM credentials:
+### 1. Chọn khách hàng
 
-```bash
-export GREENNODE_CLIENT_ID="<service-account-client-id>"
-export GREENNODE_CLIENT_SECRET="<service-account-secret>"
-```
+Mở dashboard → dropdown góc phải → chọn 1 trong 20 khách hàng demo. Mỗi khách hàng có hồ sơ khác nhau (thu nhập, sức khỏe, rủi ro, readiness).
 
-Put them in your shell profile or in a project-local `.env` (never commit it — `.env.example` is the tracked template).
+### 2. Thao tác trên app MSB (phone frame bên trái)
 
-Skills that only read local files (e.g. `agentbase-wizard init`) work without credentials.
+| Màn hình | Cách thao tác | NEXA phản hồi |
+|----------|--------------|---------------|
+| **Trang chủ** | Xem số dư, quick actions, giao dịch gần đây | — |
+| **Chuyển tiền** | Chọn người nhận → chọn mục đích → nhập số tiền → xác nhận | Gợi ý BH nếu có nhu cầu bảo vệ |
+| **Quét QR** | Chọn mục đích → nhập số tiền → xác nhận | Chỉ gợi ý khi mục đích là viện phí/học phí |
+| **Tiết kiệm** | Nhập số tiền → chọn kỳ hạn → gửi | NEXA ghi nhận hành vi tích cực |
+| **Bảo hiểm** | Duyệt 4 gói Kcare (Đồng/Bạc/Vàng/Kim Cương) + sản phẩm khác | NEXA ghi nhận interest signal |
+| **Chat NEXA** | Nhấn icon NEXA góc phải → chat tự do | Trả lời theo intent, so sánh sản phẩm |
 
----
+### 3. Giao dịch trigger gợi ý bảo hiểm
 
-## Skills Index
+Chỉ một số loại giao dịch mới trigger NEXA gợi ý:
 
-| Skill | What it does |
-|---|---|
-| `/agentbase-wizard` | **Start here.** Guided 9-step lifecycle: scaffold → configure → code → test → deploy → verify. Also handles `init`, `test`, `resume`. |
-| `/agentbase` | Platform reference — architecture, services, IAM, "which skill should I use". |
-| `/agentbase-identity` | Register agent identities; store API keys / OAuth2 credentials for external services (OpenAI, Google, Slack, …). |
-| `/agentbase-llm` | Manage **platform** LLM access — API keys, model catalog, rate limits, OpenAI-compatible endpoint. |
-| `/agentbase-memory` | Conversation history, semantic memory, long-term memory stores (LangChain/LangGraph integration). |
-| `/agentbase-deploy` | Build & push Docker image, create/update Custom Agent runtimes (PUBLIC/VPC), deploy OpenClaw Telegram/Zalo bots, manage the Container Registry. |
-| `/agentbase-monitor` | Runtime logs, endpoint logs, CPU/RAM metrics, unified resource dashboard. |
-| `/agentbase-gateway` | Resource Gateway (MCP) CRUD; inbound auth (NONE / IAM / JWT); per-target outbound auth (APIKEY / OAUTH 2LO / 3LO); VPC routes; Policy Group binding. |
-| `/agentbase-policy` | Authorization policies — Policy Groups, Policies, and `statement` bodies (effect / principal / actions / resources / condition). Enforced today on the Resource Gateway. |
-| `/agentbase-teardown` | Delete **all** resources for a project. Always supports `--dry-run`. |
+| Giao dịch | Trigger? | Lý do |
+|-----------|----------|-------|
+| Thanh toán viện phí | ✅ | Rủi ro y tế hiện hữu |
+| Thanh toán học phí | ✅ | Có người phụ thuộc |
+| Chuyển tiền người thân | ✅ | Hỗ trợ gia đình |
+| Quét QR mua sắm/ăn uống | ❌ | Giao dịch hàng ngày |
+| Gửi tiết kiệm | ❌ | Hành vi tích cực, không cần BH ngay |
 
-### Lifecycle Map
+### 4. Khi NEXA gợi ý bảo hiểm
 
-```
-┌────────────────────────────────────────────────────────┐
-│ GET STARTED                                            │
-│   /agentbase-wizard ────── guided A → Z                │
-│   /agentbase ───────────── platform reference          │
-├────────────────────────────────────────────────────────┤
-│ BUILD & CONFIGURE                                      │
-│   /agentbase-wizard init ── scaffold project           │
-│   /agentbase-llm ────────── platform LLM access        │
-│   /agentbase-identity ───── identities & external auth │
-│   /agentbase-memory ─────── memory stores              │
-├────────────────────────────────────────────────────────┤
-│ TEST & DEPLOY                                          │
-│   /agentbase-wizard test ── validate / local / docker  │
-│   /agentbase-deploy ─────── build, push, deploy        │
-├────────────────────────────────────────────────────────┤
-│ OPERATE                                                │
-│   /agentbase-monitor ────── logs, metrics, dashboard   │
-│   /agentbase-gateway ────── Resource Gateway (MCP)     │
-│   /agentbase-policy ─────── access policies            │
-├────────────────────────────────────────────────────────┤
-│ ADVANCED                                               │
-│   /agentbase-deploy cr ──── Container Registry         │
-│   /agentbase-teardown ───── delete everything          │
-└────────────────────────────────────────────────────────┘
-```
+Sau giao dịch trigger, NEXA hiện gợi ý với:
+- **Message personalize**: "NEXA nhận thấy một khoảng trống bảo vệ. Khách hàng vừa phát sinh chi phí y tế..."
+- **Product link** clickable («tên sản phẩm») → click để xem chi tiết
+- **Phí thực tế** từ sheet 08 (premium table) theo tuổi/giới tính
+- **Need score** + **Readiness score** (cap 100)
+- Nút **"Tìm hiểu sản phẩm"** → chỉ hiện thông tin, KHÔNG enroll luôn
+- Nút **"Không, cảm ơn"** → hỏi lý do từ chối → re-plan
 
-### Common Subcommands
+### 5. Chat với NEXA
 
-```text
-/agentbase-wizard   [init <name> [--langchain|--langgraph] | test [validate|local|docker|preflight] | resume | step-N | reset]
-/agentbase-identity identity <create|list|get|update|delete>          [name]
-                    auth     <apikey|delegated|oauth2> <create|list|get|update|delete|retrieve> [name]
-/agentbase-llm      <api-keys|models> <create|list|get|update|delete|enable|disable|rate-limit> [name-or-uuid]
-/agentbase-memory   memory  <create|list|get|delete> [id]
-                    events  <list|create|delete>
-                    records <browse|search|generate-from-session|generate-from-content|insert|delete>
-/agentbase-deploy   Custom Agent: build → push → deploy, runtime CRUD, scale, versions
-                    OpenClaw:     create|list|start|stop|switch-version (Telegram/Zalo templates)
-                    Container Registry: repo info, credentials, images, artifacts
-/agentbase-monitor  <runtime-logs|endpoint-logs|metrics|dashboard> [runtime-id] [endpoint-id]
-/agentbase-gateway  <create|list|get|update|delete|routes|repair|flavors> [gateway-name]
-/agentbase-policy   <group|policy> <create|list|get|update|delete> [group-id-or-name] [policy-id-or-name]
-/agentbase-teardown <project-name> [--dry-run]
-```
+Nhấn icon NEXA (góc dưới phải) để mở chat. Gõ tự do hoặc dùng quick replies.
 
-> These skills are driven by natural language — the syntax above is a quick reference, not a strict CLI. Tell the model what you want and it picks the right operation.
+| Lệnh/Câu hỏi | NEXA phản hồi |
+|--------------|---------------|
+| **"so sánh sản phẩm"** / **"compare"** / **"gói nào tốt"** | Bảng so sánh tất cả sản phẩm BH với affordability score |
+| **"tôi phù hợp với sản phẩm nào?"** | Đánh giá suitability dựa trên Need/Readiness/Evidence |
+| **"phí bao nhiêu?"** | Phí sản phẩm hiện tại + % thu nhập |
+| **"quyền lợi gì?"** | Quyền lợi chi tiết |
+| **"có gói rẻ hơn không?"** | Đề xuất alternatives (micro-saving, gói thấp hơn) |
+| **"bảo hiểm ung thư"** (tên sản phẩm) | Thông tin chi tiết sản phẩm đó |
+| **"không muốn"** / **"từ chối"** | Hỏi lý do → re-plan theo 6 lý do từ chối |
+| **"đồng ý"** / **"tham gia"** | Khởi tạo enrollment → GCNBH |
+
+### 6. So sánh sản phẩm
+
+Gõ **"so sánh sản phẩm"** trong chat → NEXA hiện bảng so sánh:
+
+- **Tất cả sản phẩm BH sức khỏe** (17 gói từ RP01-RP04)
+- **Phí/năm** từ premium table (sheet 08)
+- **% thu nhập** — phí chiếm bao nhiêu % thu nhập năm
+- **Đệm thanh** — số tháng có thể trả phí từ tiền dư (số dư - nợ)
+- **Đánh giá**: Rất phù hợp / Phù hợp / Khó khăn / Không phù hợp
+- Xếp theo % thu nhập tăng dần
+
+### 7. 6 lý do từ chối → 6 phản ứng khác nhau
+
+| Lý do | NEXA phản ứng |
+|-------|---------------|
+| Chưa cần lúc này | Educate & Nurture + hẹn reassess |
+| Phí cao quá | Đề xuất Micro-saving pathway |
+| Không tin tưởng BH | Gửi thông tin chi tiết, build trust |
+| Đã có BH khác | Suppress, ghi nhận |
+| Cần tìm hiểu thêm | Gửi chi tiết quyền lợi, điều khoản |
+| Muốn gặp TVV | Escalate to human (RM 24h) |
 
 ---
 
-## End-to-End Example — Build a Chatbot
+## Sản phẩm bảo hiểm
 
-```bash
-/agentbase-wizard init my-chatbot --langgraph   # scaffold
-/agentbase-llm api-keys create my-chatbot-key   # platform LLM key
-/agentbase-memory create                         # optional memory store
-/agentbase-wizard test local                     # smoke test locally
-/agentbase-deploy deploy                         # build → push → deploy
-/agentbase-monitor runtime-logs <runtime-id>     # watch it run
-```
+### Product mapping theo sheet 3
 
-Or, first time, just:
+Sản phẩm đề xuất cho từng khách hàng được lấy từ cột **"Sản phẩm đề xuất"** trong sheet `03_CustomerProfiles`:
 
-```text
-/agentbase-wizard
-```
+| Khách hàng | Sản phẩm đề xuất | Action |
+|------------|-----------------|--------|
+| VN00012 | Bảo Việt An Gia — Kim Cương | Offer Insurance |
+| VN02939 | Bảo Việt An Gia — Vàng | Offer Insurance |
+| VN00035 | Bệnh hiểm nghèo — Platinum | Offer Insurance |
+| VN00105 | Trợ cấp nằm viện — VIP | Offer Insurance |
+| VN00005 | Bệnh hiểm nghèo — Gold | Educate & Nurture |
+| VN00001 | Bệnh hiểm nghèo — Silver | Micro-saving pathway |
+| ... | ... | ... |
 
-…and follow the prompts.
+### Phí Kcare (sheet 08)
 
----
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---|---|
-| Skill doesn't appear | Confirm the file is at `<skills-dir>/<skill-name>/SKILL.md` with valid `name` + `description` frontmatter, then restart the tool. |
-| `401 Unauthorized` | `GREENNODE_CLIENT_ID` / `GREENNODE_CLIENT_SECRET` missing, expired, or service account lacks IAM policies. |
-| `OOMKilled` during deploy | Pick a larger flavor — ask `/agentbase-deploy` to list eligible flavors and resize the runtime. |
-| Want to resume a half-finished session | State persists in `.agentbase-state.json` — run `/agentbase-wizard resume`. |
-| Different skill behavior across tools | Tightest validator wins (typically Claude Desktop). Re-read the SKILL.md frontmatter; description length / characters may need trimming. |
+| Gói | Phí tối thiểu/năm |
+|-----|-------------------|
+| Đồng | 306,960đ |
+| Bạc | 613,920đ |
+| Vàng | 1,227,840đ |
+| Kim Cương | 2,455,680đ |
 
 ---
 
-## Repo Layout
+## API
 
-```
-greennode-agentbase-skills/
-├── .claude-plugin/             # Claude Code plugin + marketplace manifests
-├── .codex-plugin/              # Codex plugin manifest (paired with .agents marketplace)
-├── .agents/plugins/            # Codex CLI marketplace manifest
-├── skills/                     # <-- the skills you install
-│   ├── agentbase/              # platform reference
-│   ├── agentbase-wizard/       # guided full-lifecycle wizard
-│   ├── agentbase-deploy/       # build, push, deploy + Container Registry + OpenClaw
-│   ├── agentbase-identity/     # agent identities & outbound auth
-│   ├── agentbase-llm/          # platform LLM API keys & models
-│   ├── agentbase-memory/       # conversation + semantic memory
-│   ├── agentbase-monitor/      # logs, metrics, dashboard
-│   ├── agentbase-gateway/      # Resource Gateway (MCP)
-│   ├── agentbase-policy/       # authorization policies
-│   └── agentbase-teardown/     # delete all resources
-└── README.md
-```
-
-Each skill folder contains a `SKILL.md` (the contract read by the AI tool) and any helper `scripts/` or `references/` it needs.
+| Endpoint | Method | Mô tả |
+|----------|--------|-------|
+| `/health` | GET | Health check (platform requirement) |
+| `/api/demo-customers` | GET | 20 demo customers |
+| `/api/customer/:id` | GET | Chi tiết 1 khách hàng |
+| `/api/products` | GET | Catalogue sản phẩm BH (with min_premium_vnd) |
+| `/api/analyze` | POST | Phân tích giao dịch → gợi ý BH |
+| `/api/compare-products/:customerId` | GET | So sánh tất cả sản phẩm theo affordability |
+| `/api/refuse` | POST | Xử lý từ chối → re-plan |
+| `/api/accept` | POST | Xử lý đồng ý → GCNBH |
+| `/api/transactions` | GET | Loại giao dịch |
+| `/api/refusal-reasons` | GET | 6 lý do từ chối |
 
 ---
 
-## Contributing & Extending
+## Kiến trúc
 
-- Each skill is just a folder with a `SKILL.md` file — copy an existing one as a template.
-- Frontmatter (`name`, `description`) is a public contract — renaming breaks downstream tools. Update `README.md` cross-references when you rename.
-- Skill descriptions must satisfy the **tightest** client validator (typically Claude Desktop's character limit). Verify before committing.
-- Test the skill end-to-end in Claude Code (or your target client) before opening a PR — descriptions drive auto-routing, so a small wording change can shift which skill is picked.
+```
+nexa/
+├── server.js              # Express API server (port 8080)
+├── data-loader.js         # Load Excel dataset (sheets 03, 04, 06, 07, 08)
+├── Dockerfile             # Docker image for AgentBase
+├── agent/
+│   ├── tools.js           # 3 Tools: Need score, Readiness score, Product KB
+│   ├── interactive.js     # Transaction analysis + chat flow + compare
+│   ├── engine.js          # Full loop (scenario mode)
+│   └── scenarios.js       # Pre-scripted scenarios
+├── public/
+│   ├── index.html         # App layout
+│   ├── css/style.css      # MSB orange theme
+│   ├── js/app.js          # Full interactive app + NEXA chatbot
+│   └── assets/
+│       ├── icon.png       # NEXA bot icon
+│       └── qr-code.png    # QR code for payment screen
+└── data/
+    └── dataset.xlsx       # ReadyShield demo dataset (gitignored)
+```
+
+### Data sources (Excel sheets)
+
+| Sheet | Nội dung |
+|-------|----------|
+| `03_CustomerProfiles` | 20 demo customers + product mapping |
+| `04_FullDataset` | 5000 customers với tất cả columns |
+| `06_AgentLoopData` | Real-time signals, interaction history, loop state |
+| `07_RealProductCatalogue` | 21 sản phẩm BH (RP01-RP08) |
+| `08_RealProductPremiumTable` | Premium table theo tuổi/giới tính |
 
 ---
 
-## Important Notes
+## Scoring Engine
 
-1. **Verify IAM credentials first** — the majority of platform errors are missing `GREENNODE_CLIENT_ID` / `GREENNODE_CLIENT_SECRET` or insufficient policies.
-2. **Validate before deploy** — `/agentbase-wizard test validate`.
-3. **Always `--dry-run` teardown** before the real delete.
-4. **Never commit `.env`** — only `.env.example` is tracked.
-5. **First time? Use `/agentbase-wizard`** — it covers the full 9-step path.
+### Need Score (Tool 2) — WHY
+
+| Factor | Weight |
+|--------|--------|
+| Health vulnerability | 30% |
+| Recent medical event | 30% |
+| No private insurance | 25% |
+| Dependents | 10% |
+| Healthcare spending | 5% |
+
+High: ≥70 | Medium: 45-69 | Low: <45 | **Cap: 100**
+
+### Readiness Score (Tool 3) — WHEN
+
+| Factor | Weight |
+|--------|--------|
+| Affordability | 40% |
+| Financial stability | 30% |
+| Access readiness | 20% |
+| Engagement | 10% |
+
+High: ≥70 | Medium: 50-69 | Low: <50 | **Cap: 100**
+
+### Decision Matrix (Tool 4) — WHAT
+
+| Need \ Readiness | High | Medium | Low |
+|------------------|------|--------|-----|
+| **High** | Offer Insurance | Educate & Nurture | Micro-saving |
+| **Medium** | Offer Insurance | Educate & Nurture | Suppress |
+| **Low** | Suppress | Suppress | Suppress |
+
+---
+
+## GreenNode AgentBase Deployment
+
+| Thông tin | Giá trị |
+|-----------|---------|
+| Runtime name | `nexa-msb-agent` |
+| Runtime ID | `runtime-c572a982-bc5c-4d1f-a692-e36b5cc9fbbd` |
+| Flavor | `runtime-s2-general-2x4` (2 CPU, 4GB RAM) |
+| Image | `vcr.vngcloud.vn/111480-abp114597/nexa:<tag>` |
+| Endpoint | https://endpoint-a9323e02-88e8-4eac-b841-0f19c16a9e5d.agentbase-runtime.aiplatform.vngcloud.vn |
+| Console | https://aiplatform.console.vngcloud.vn/agent-runtime?tab=runtime |
+
+---
+
+## Tech Stack
+
+- **Backend**: Node.js + Express
+- **Frontend**: Vanilla JS + CSS (phone frame simulation)
+- **Data**: Excel (xlsx library)
+- **Deploy**: Docker → GreenNode AgentBase Container Registry → Runtime
+- **UI**: MSB orange theme (#e85d04, #f58220)
